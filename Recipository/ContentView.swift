@@ -6,18 +6,28 @@
 //
 
 import SwiftUI
-import RealityKit
-import RealityKitContent
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Model3D(named: "Scene", bundle: realityKitContentBundle)
-                .padding(.bottom, 50)
+    @State private var currentPage: Page = .voiceCommands
 
-            Text("Hello, world!")
+    enum Page {
+        case voiceCommands
+        case ingredientsAndEquipment
+        case rating
+        case recipe
+    }
+
+    var body: some View {
+        switch currentPage {
+        case .voiceCommands:
+            VoiceCommandsView(onDismiss: { currentPage = .recipe })
+        case .ingredientsAndEquipment:
+            IngredientsAndEquipmentView()
+        case .rating:
+            RatingView()
+        case .recipe:
+            RecipeView()
         }
-        .padding()
     }
 }
 

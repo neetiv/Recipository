@@ -13,5 +13,6 @@ struct RecipositoryApp: App {
         WindowGroup {
             ContentView()
         }
+        .windowStyle(.plain)
     }
 }
