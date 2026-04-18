@@ -5,19 +5,51 @@
 
 import SwiftUI
 
+/// Shows one step at a time with prev/next (teammate UX) using the shared `Meal` model (no second fetch).
 struct RecipeStepView: View {
-    let detail: MealDetail?
+    let meal: Meal
     @Binding var currentStepIndex: Int
-    let isLoading: Bool
 
-    private var steps: [String] { detail?.steps ?? [] }
+    private var steps: [String] { meal.instructionSteps }
+
     private var hasPrev: Bool { currentStepIndex > 0 }
-    private var hasNext: Bool { currentStepIndex < steps.count - 1 }
+    private var hasNext: Bool { steps.count > 0 && currentStepIndex < steps.count - 1 }
 
     var body: some View {
-        HStack(spacing: 8) {
+        Group {
+            if steps.isEmpty {
+                scrollFallback
+            } else {
+                stepPager
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Recipe steps for \(meal.strMeal)")
+    }
 
-            // Prev button
+    private var scrollFallback: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(meal.strMeal)
+                    .font(.title2.weight(.semibold))
+
+                if let text = meal.strInstructions?.trimmingCharacters(in: .whitespacesAndNewlines),
+                   !text.isEmpty {
+                    Text(text.replacingOccurrences(of: "\r\n", with: "\n"))
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("No steps available.")
+                        .font(.subheadline)
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var stepPager: some View {
+        HStack(spacing: 8) {
             Button {
                 if hasPrev { currentStepIndex -= 1 }
             } label: {
@@ -30,10 +62,7 @@ struct RecipeStepView: View {
 
             // Step content
             VStack(alignment: .leading, spacing: 2) {
-                if isLoading {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if steps.isEmpty {
+                if steps.isEmpty {
                     Text("No steps available.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -53,7 +82,6 @@ struct RecipeStepView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .padding(.horizontal, 4)
 
-            // Next button
             Button {
                 if hasNext { currentStepIndex += 1 }
             } label: {
@@ -63,7 +91,13 @@ struct RecipeStepView: View {
             .buttonStyle(.plain)
             .opacity(hasNext ? 1 : 0.25)
             .disabled(!hasNext)
+            .accessibilityLabel("Next step")
+            .accessibilityHint("Go to the next instruction")
         }
-        .padding(.horizontal, 10)
+        .padding(.horizontal, 6)
     }
+}
+
+#Preview {
+    RecipeStepView(meal: .preview, currentStepIndex: .constant(0))
 }
