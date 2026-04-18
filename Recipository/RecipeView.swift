@@ -2,16 +2,16 @@
 //  RecipeView.swift
 //  Recipository
 //
-//  Created by Neeti Vaidya on 4/18/26.
-//
 
 import SwiftUI
 
 struct RecipeView: View {
     /// Summary meal from the list (id + title + thumb). Full detail is loaded once into `detailMeal`.
     let summaryMeal: Meal
+    var onBack: () -> Void
 
     @State private var detailMeal: Meal?
+    @State private var currentStepIndex = 0
     @State private var isLoading = false
     @State private var errorMessage: String?
 
@@ -44,11 +44,28 @@ struct RecipeView: View {
 
     var body: some View {
         VStack(spacing: 16) {
+            HStack {
+                Button {
+                    onBack()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .font(.subheadline)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Back")
+                .accessibilityHint("Return to the recipe list")
+                .accessibilityInputLabels(["Back"])
+                Spacer()
+            }
+
             Group {
                 switch selectedTab {
                 case .steps:
                     recipeDetailTab { meal in
-                        RecipeStepView(meal: meal)
+                        RecipeStepView(meal: meal, currentStepIndex: $currentStepIndex)
                     }
                 case .ingredients:
                     recipeDetailTab { meal in
@@ -121,6 +138,7 @@ struct RecipeView: View {
         isLoading = true
         errorMessage = nil
         detailMeal = nil
+        currentStepIndex = 0
         do {
             detailMeal = try await MealService.fetchMealDetail(id: summaryMeal.idMeal)
         } catch {
@@ -131,5 +149,5 @@ struct RecipeView: View {
 }
 
 #Preview {
-    RecipeView(summaryMeal: .preview)
+    RecipeView(summaryMeal: .preview, onBack: {})
 }

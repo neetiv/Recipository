@@ -5,7 +5,7 @@ A visionOS hands-free cooking assistant.
 ## Navigation Flow
 
 ```
-Voice Commands → Recipe List → Recipe (tabs: Steps | Ingredients | Timer | Rating)
+Voice Commands → Recipe List → Recipe (cooking workspace)
 ```
 
 ## File Tree
@@ -23,20 +23,36 @@ Recipository/
 ├── PAGE 2: Recipe List
 │   └── RecipeListView.swift           ← Browse desserts from TheMealDB API
 │
-└── PAGE 3: Recipe (Cooking View)
-    ├── RecipeView.swift               ← Glass bubble container + tab bar (Shared)
+└── PAGE 3: Recipe (Cooking Workspace)
+    ├── RecipeView.swift               ← Layout container (Shared)
     │
-    ├── TAB: Steps
-    │   └── RecipeStepView.swift       ← Step-by-step cooking instructions
+    ├── STEP BAR (top, wide)
+    │   └── RecipeStepView.swift       ← Current step instructions
     │
-    ├── TAB: Ingredients
-    │   └── IngredientsAndEquipmentView.swift ← Ingredient list & equipment
-    │
-    ├── TAB: Timer
+    ├── TIMER (top right, small)
     │   └── TimerView.swift            ← Countdown timer
     │
-    └── TAB: Rating
-        └── RatingView.swift           ← Rate the recipe
+    ├── BUTTON: Ingredients
+    │   └── IngredientsAndEquipmentView.swift
+    │
+    ├── BUTTON: Method
+    │   └── MethodView.swift
+    │
+    └── BUTTON: Finished Product
+        └── FinishedProductView.swift
+```
+
+## Cooking Workspace Layout
+
+```
+┌──────────────────────────────┐  ┌─────────┐
+│            step              │  │  timer   │
+└──────────────────────────────┘  └─────────┘
+┌─────────────┐ ┌────────┐ ┌─────────────────┐
+│ ingredients │ │ method │ │ finished product │
+└─────────────┘ └────────┘ └─────────────────┘
+
+          ( workspace stays clear )
 ```
 
 ## Who Works on What
@@ -46,6 +62,8 @@ Recipository/
 | `RecipeStepView.swift` | | Placeholder |
 | `IngredientsAndEquipmentView.swift` | | Placeholder |
 | `TimerView.swift` | | Placeholder |
-| `RatingView.swift` | | Placeholder |
+| `IngredientsAndEquipmentView.swift` | | Placeholder |
+| `MethodView.swift` | | Placeholder |
+| `FinishedProductView.swift` | | Placeholder |
 
 Fill in the **Owner** column so everyone knows who's building what.
