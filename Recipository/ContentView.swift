@@ -12,6 +12,7 @@ struct ContentView: View {
 
     enum Page {
         case voiceCommands
+        case recipeList
         case ingredientsAndEquipment
         case rating
         case recipe
@@ -20,7 +21,9 @@ struct ContentView: View {
     var body: some View {
         switch currentPage {
         case .voiceCommands:
-            VoiceCommandsView(onDismiss: { currentPage = .recipe })
+            VoiceCommandsView(onDismiss: { currentPage = .recipeList })
+        case .recipeList:
+            RecipeListView(onSelectRecipe: { _ in currentPage = .recipe })
         case .ingredientsAndEquipment:
             IngredientsAndEquipmentView()
         case .rating:

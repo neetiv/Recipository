@@ -14,5 +14,6 @@ struct RecipositoryApp: App {
             ContentView()
         }
         .windowStyle(.plain)
+        .defaultSize(width: 440, height: 500)
     }
 }
