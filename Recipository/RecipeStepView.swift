@@ -44,9 +44,10 @@ struct RecipeStepView: View {
                         .foregroundStyle(.secondary)
 
                     Text(steps[currentStepIndex])
-                        .font(.caption)
-                        .lineLimit(3)
-                        .fixedSize(horizontal: false, vertical: false)
+                        .font(.body)                          // start bigger than .caption
+                        .minimumScaleFactor(0.3)              // allow shrinking if needed
+                        .lineLimit(nil)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
