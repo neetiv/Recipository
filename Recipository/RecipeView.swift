@@ -2,22 +2,23 @@
 //  RecipeView.swift
 //  Recipository
 //
-//  Created by Neeti Vaidya on 4/18/26.
-//
 
 import SwiftUI
 
 struct RecipeView: View {
+    let meal: Meal
     var onBack: () -> Void
+
+    @State private var detail: MealDetail? = nil
+    @State private var currentStepIndex: Int = 0
+    @State private var isLoading = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Spacer()
-                .frame(height: 0)
+            Spacer().frame(height: 0)
+
             // Back button
-            Button {
-                onBack()
-            } label: {
+            Button { onBack() } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "chevron.left")
                     Text("Back")
@@ -28,14 +29,16 @@ struct RecipeView: View {
 
             // Top row: Step bar + Timer
             HStack(alignment: .top, spacing: 12) {
-                // Step bar — wide
-                RecipeStepView()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 80)
-                    .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
-                    .glassBackgroundEffect()
+                RecipeStepView(
+                    detail: detail,
+                    currentStepIndex: $currentStepIndex,
+                    isLoading: isLoading
+                )
+                .frame(maxWidth: .infinity)
+                .frame(height: 80)
+                .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
+                .glassBackgroundEffect()
 
-                // Timer — small
                 TimerView()
                     .frame(width: 100, height: 80)
                     .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
@@ -45,24 +48,27 @@ struct RecipeView: View {
             // Action buttons row
             HStack(spacing: 10) {
                 IngredientsAndEquipmentView()
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, 16).padding(.vertical, 10)
                     .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
                     .glassBackgroundEffect()
 
                 MethodView()
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, 16).padding(.vertical, 10)
                     .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
                     .glassBackgroundEffect()
 
                 FinishedProductView()
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, 16).padding(.vertical, 10)
                     .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
                     .glassBackgroundEffect()
             }
         }
         .padding()
+        .task {
+            isLoading = true
+            detail = try? await MealService.fetchDetail(id: meal.idMeal)
+            currentStepIndex = 0
+            isLoading = false
+        }
     }
 }

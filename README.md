@@ -60,6 +60,7 @@ Recipository/
 | File | Owner | Status |
 |------|-------|--------|
 | `RecipeStepView.swift` | | Placeholder |
+| `IngredientsAndEquipmentView.swift` | | Placeholder |
 | `TimerView.swift` | | Placeholder |
 | `IngredientsAndEquipmentView.swift` | | Placeholder |
 | `MethodView.swift` | | Placeholder |

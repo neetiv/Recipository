@@ -2,34 +2,35 @@
 //  ContentView.swift
 //  Recipository
 //
-//  Created by Neeti Vaidya on 4/18/26.
-//
 
 import SwiftUI
 
 struct ContentView: View {
     @State private var currentPage: Page = .voiceCommands
+    @State private var selectedMeal: Meal? = nil
 
     enum Page {
-        case voiceCommands
-        case recipeList
-        case ingredientsAndEquipment
-        case rating
-        case recipe
+        case voiceCommands, recipeList, recipe
     }
 
     var body: some View {
         switch currentPage {
         case .voiceCommands:
             VoiceCommandsView(onDismiss: { currentPage = .recipeList })
+
         case .recipeList:
-            RecipeListView(onSelectRecipe: { _ in currentPage = .recipe })
-        case .ingredientsAndEquipment:
-            IngredientsAndEquipmentView()
-        case .rating:
-            RatingView()
+            RecipeListView { meal in
+                selectedMeal = meal
+                currentPage = .recipe
+            }
+
         case .recipe:
-            RecipeView(onBack: { currentPage = .recipeList })
+            if let meal = selectedMeal {
+                RecipeView(meal: meal, onBack: {
+                    selectedMeal = nil
+                    currentPage = .recipeList
+                })
+            }
         }
     }
 }
