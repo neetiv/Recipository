@@ -40,10 +40,12 @@ struct RecipeView: View {
                 .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
                 .glassBackgroundEffect()
 
-                TimerView()
-                    .frame(width: 100, height: 80)
-                    .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
-                    .glassBackgroundEffect()
+                if !isLoading, let steps = detail?.steps, steps.indices.contains(currentStepIndex) {
+                        TimerView(stepString: steps[currentStepIndex])
+                            .frame(width: 120, height: 80)
+                            .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
+                            .glassBackgroundEffect()
+                    }
             }
 
             // Action buttons row
