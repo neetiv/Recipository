@@ -5,7 +5,7 @@
 //  Created by Neeti Vaidya on 4/18/26.
 //
 
-import SwiftUI
+/*import SwiftUI
 
 struct IngredientsAndEquipmentView: View {
     let meal: Meal
@@ -625,4 +625,4 @@ private struct ParsedAmount {
 
 #Preview {
     IngredientsAndEquipmentView(meal: .preview)
-}
+}*/
