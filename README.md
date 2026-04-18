@@ -8,9 +8,13 @@ A visionOS hands-free cooking assistant.
 |------|-------|-------------|
 | `ContentView.swift` | Shared | Router — controls which page is displayed |
 | `VoiceCommandsView.swift` | | Welcome notice showing available voice commands |
-| `IngredientsAndEquipmentView.swift` | | Ingredients list and required equipment |
-| `RatingView.swift` | | Recipe rating and feedback |
-| `RecipeView.swift` | | Step-by-step cooking instructions |
+| `RecipeListView.swift` | Shared | Browse and choose a dessert recipe (API) |
+| `MealService.swift` | Shared | API service and Meal data model |
+| `RecipeView.swift` | Shared | Glass bubble container with tab bar |
+| `RecipeStepView.swift` | | Step-by-step cooking instructions (tab) |
+| `IngredientsAndEquipmentView.swift` | | Ingredients list and required equipment (tab) |
+| `TimerView.swift` | | Countdown timer (tab) |
+| `RatingView.swift` | | Recipe rating and feedback (tab) |
 | `RecipositoryApp.swift` | Shared | App entry point and window configuration |
 
 ## Pages
@@ -18,16 +22,17 @@ A visionOS hands-free cooking assistant.
 ### Voice Commands
 Initial screen shown on app launch. Lists available voice commands for hands-free navigation.
 
-### Ingredients & Equipment
-Displays the ingredient list and any equipment needed before starting a recipe.
+### Recipe List
+Browse desserts fetched from TheMealDB API. Tap a recipe to start cooking.
 
-### Rating
-Allows users to rate a recipe after cooking.
-
-### Recipe
-The main cooking view — walks through recipe steps one at a time.
+### Recipe (Cooking View)
+One glass bubble with 4 tabs at the bottom. Each tab is a separate file so teammates can work in parallel:
+- **Steps** → `RecipeStepView.swift`
+- **Ingredients** → `IngredientsAndEquipmentView.swift`
+- **Timer** → `TimerView.swift`
+- **Rating** → `RatingView.swift`
 
 ## Navigation Flow
 ```
-Voice Commands → Recipe → (Ingredients & Equipment, Rating)
+Voice Commands → Recipe List → Recipe (tabs: Steps | Ingredients | Timer | Rating)
 ```
