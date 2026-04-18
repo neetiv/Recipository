@@ -13,60 +13,76 @@ struct RecipeView: View {
     @State private var currentStepIndex: Int = 0
     @State private var isLoading = true
 
+    private var currentStep: String {
+        detail?.steps[safe: currentStepIndex] ?? ""
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Spacer().frame(height: 0)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                Spacer().frame(height: 0)
 
-            // Back button
-            Button { onBack() } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "chevron.left")
-                    Text("Back")
+                // Back button
+                Button { onBack() } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .font(.subheadline)
                 }
-                .font(.subheadline)
-            }
-            .buttonStyle(.plain)
+                .buttonStyle(.plain)
 
-            // Top row: Step bar + Timer
-            HStack(alignment: .top, spacing: 12) {
-                RecipeStepView(
-                    detail: detail,
-                    currentStepIndex: $currentStepIndex,
-                    isLoading: isLoading
-                )
-                .frame(maxWidth: .infinity)
-                .frame(height: 80)
-                .padding(8)
-                .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
-                .glassBackgroundEffect()
+                // Top row: Step bar + Timer side by side
+                HStack(alignment: .top, spacing: 12) {
+                    RecipeStepView(
+                        detail: detail,
+                        currentStepIndex: $currentStepIndex,
+                        isLoading: isLoading
+                    )
+                    .frame(maxWidth: .infinity)
+                    .padding(8)
+                    .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
+                    .glassBackgroundEffect()
 
-                if !isLoading, let steps = detail?.steps, steps.indices.contains(currentStepIndex) {
+                    if !isLoading,
+                       let steps = detail?.steps,
+                       steps.indices.contains(currentStepIndex) {
                         TimerView(stepString: steps[currentStepIndex])
-                            .frame(width: 120, height: 80)
+                            .frame(width: 110)
+                            .fixedSize(horizontal: true, vertical: false)
                             .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
                             .glassBackgroundEffect()
                     }
-            }
+                }
+                .frame(maxWidth: .infinity)
 
-            // Action buttons row
-            HStack(spacing: 10) {
-                MethodView()
-                    .padding(.horizontal, 16).padding(.vertical, 10)
-                    .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
-                    .glassBackgroundEffect()
+                // Method button — only shown when a culinary keyword is detected
+                if !currentStep.isEmpty {
+                    let keywords = ["whisk", "fold", "knead", "cream", "sift", "pipe", "separate", "temper"]
+                    let needsMethod = keywords.contains { currentStep.lowercased().contains($0) }
 
-                FinishedProductView()
-                    .padding(.horizontal, 16).padding(.vertical, 10)
-                    .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
-                    .glassBackgroundEffect()
+                    if needsMethod {
+                        MethodView(currentStep: currentStep)
+                            .padding(.horizontal, 16).padding(.vertical, 10)
+                            .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
+                            .glassBackgroundEffect()
+                    }
+                }
             }
+            .padding()
         }
-        .padding()
         .task {
             isLoading = true
             detail = try? await MealService.fetchDetail(id: meal.idMeal)
             currentStepIndex = 0
             isLoading = false
         }
+    }
+}
+
+// Safe array subscript
+extension Array {
+    subscript(safe index: Int) -> Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }
