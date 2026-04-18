@@ -8,6 +8,13 @@
 import SwiftUI
 
 struct RecipeView: View {
+    /// Summary meal from the list (id + title + thumb). Full detail is loaded once into `detailMeal`.
+    let summaryMeal: Meal
+
+    @State private var detailMeal: Meal?
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+
     @State private var selectedTab: Tab = .steps
 
     enum Tab: String, CaseIterable {
@@ -24,17 +31,29 @@ struct RecipeView: View {
             case .rating: return "star"
             }
         }
+
+        var accessibilityHint: String {
+            switch self {
+            case .steps: return "Shows cooking steps for this recipe."
+            case .ingredients: return "Shows ingredients and suggested equipment."
+            case .timer: return "Opens the countdown timer."
+            case .rating: return "Rate this recipe."
+            }
+        }
     }
 
     var body: some View {
         VStack(spacing: 16) {
-            // Content bubble — swaps based on selected tab
             Group {
                 switch selectedTab {
                 case .steps:
-                    RecipeStepView()
+                    recipeDetailTab { meal in
+                        RecipeStepView(meal: meal)
+                    }
                 case .ingredients:
-                    IngredientsAndEquipmentView()
+                    recipeDetailTab { meal in
+                        IngredientsAndEquipmentView(meal: meal)
+                    }
                 case .timer:
                     TimerView()
                 case .rating:
@@ -45,7 +64,6 @@ struct RecipeView: View {
             .padding()
             .glassBackgroundEffect()
 
-            // Tab bar
             HStack(spacing: 12) {
                 ForEach(Tab.allCases, id: \.self) { tab in
                     Button {
@@ -62,10 +80,56 @@ struct RecipeView: View {
                     }
                     .buttonStyle(.plain)
                     .opacity(selectedTab == tab ? 1.0 : 0.5)
+                    .accessibilityLabel(tab.rawValue)
+                    .accessibilityHint(tab.accessibilityHint)
+                    .accessibilityInputLabels([tab.rawValue])
+                    .accessibilityAddTraits(selectedTab == tab ? [.isButton, .isSelected] : .isButton)
                 }
             }
             .padding(.horizontal)
         }
         .padding()
+        .task(id: summaryMeal.idMeal) {
+            await loadDetailIfNeeded()
+        }
     }
+
+    @ViewBuilder
+    private func recipeDetailTab<Content: View>(
+        @ViewBuilder content: @escaping (Meal) -> Content
+    ) -> some View {
+        if isLoading, detailMeal == nil {
+            ProgressView("Loading recipe…")
+                .accessibilityLabel("Loading recipe")
+                .accessibilityHint("Recipe details are being downloaded.")
+        } else if let errorMessage, detailMeal == nil {
+            Text(errorMessage)
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .accessibilityLabel(errorMessage)
+        } else if let meal = detailMeal {
+            content(meal)
+        } else {
+            ProgressView("Loading recipe…")
+                .accessibilityLabel("Loading recipe")
+        }
+    }
+
+    private func loadDetailIfNeeded() async {
+        guard detailMeal?.idMeal != summaryMeal.idMeal else { return }
+        isLoading = true
+        errorMessage = nil
+        detailMeal = nil
+        do {
+            detailMeal = try await MealService.fetchMealDetail(id: summaryMeal.idMeal)
+        } catch {
+            errorMessage = "Could not load this recipe. Check your connection and try again."
+        }
+        isLoading = false
+    }
+}
+
+#Preview {
+    RecipeView(summaryMeal: .preview)
 }
