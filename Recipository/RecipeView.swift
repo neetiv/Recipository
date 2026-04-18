@@ -8,63 +8,60 @@
 import SwiftUI
 
 struct RecipeView: View {
-    @State private var selectedTab: Tab = .steps
-
-    enum Tab: String, CaseIterable {
-        case steps = "Steps"
-        case ingredients = "Ingredients"
-        case timer = "Timer"
-        case rating = "Rating"
-
-        var icon: String {
-            switch self {
-            case .steps: return "list.number"
-            case .ingredients: return "fork.knife"
-            case .timer: return "timer"
-            case .rating: return "star"
-            }
-        }
-    }
+    var onBack: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            // Content bubble — swaps based on selected tab
-            Group {
-                switch selectedTab {
-                case .steps:
-                    RecipeStepView()
-                case .ingredients:
-                    IngredientsAndEquipmentView()
-                case .timer:
-                    TimerView()
-                case .rating:
-                    RatingView()
+        VStack(alignment: .leading, spacing: 12) {
+            Spacer()
+                .frame(height: 0)
+            // Back button
+            Button {
+                onBack()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "chevron.left")
+                    Text("Back")
                 }
+                .font(.subheadline)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding()
-            .glassBackgroundEffect()
+            .buttonStyle(.plain)
 
-            // Tab bar
-            HStack(spacing: 12) {
-                ForEach(Tab.allCases, id: \.self) { tab in
-                    Button {
-                        selectedTab = tab
-                    } label: {
-                        VStack(spacing: 4) {
-                            Image(systemName: tab.icon)
-                                .font(.title3)
-                            Text(tab.rawValue)
-                                .font(.caption)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                    }
-                    .buttonStyle(.plain)
-                    .opacity(selectedTab == tab ? 1.0 : 0.5)
-                }
+            // Top row: Step bar + Timer
+            HStack(alignment: .top, spacing: 12) {
+                // Step bar — wide
+                RecipeStepView()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 80)
+                    .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
+                    .glassBackgroundEffect()
+
+                // Timer — small
+                TimerView()
+                    .frame(width: 100, height: 80)
+                    .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
+                    .glassBackgroundEffect()
             }
-            .padding(.horizontal)
+
+            // Action buttons row
+            HStack(spacing: 10) {
+                IngredientsAndEquipmentView()
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
+                    .glassBackgroundEffect()
+
+                MethodView()
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
+                    .glassBackgroundEffect()
+
+                FinishedProductView()
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color(red: 0.588, green: 0.482, blue: 0.714).opacity(0.15))
+                    .glassBackgroundEffect()
+            }
         }
         .padding()
     }

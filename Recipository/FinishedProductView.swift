@@ -1,5 +1,5 @@
 //
-//  IngredientsAndEquipmentView.swift
+//  FinishedProductView.swift
 //  Recipository
 //
 //  Created by Neeti Vaidya on 4/18/26.
@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct IngredientsAndEquipmentView: View {
+struct FinishedProductView: View {
     var body: some View {
-        // TODO: Build ingredients and equipment list UI
-        Text("Ingredients")
+        // TODO: Build finished product view
+        Text("Finished Product")
             .font(.subheadline)
             .fontWeight(.medium)
     }

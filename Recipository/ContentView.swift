@@ -29,7 +29,7 @@ struct ContentView: View {
         case .rating:
             RatingView()
         case .recipe:
-            RecipeView()
+            RecipeView(onBack: { currentPage = .recipeList })
         }
     }
 }

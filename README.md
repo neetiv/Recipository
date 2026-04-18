@@ -2,37 +2,67 @@
 
 A visionOS hands-free cooking assistant.
 
-## File Structure
-
-| File | Owner | Description |
-|------|-------|-------------|
-| `ContentView.swift` | Shared | Router — controls which page is displayed |
-| `VoiceCommandsView.swift` | | Welcome notice showing available voice commands |
-| `RecipeListView.swift` | Shared | Browse and choose a dessert recipe (API) |
-| `MealService.swift` | Shared | API service and Meal data model |
-| `RecipeView.swift` | Shared | Glass bubble container with tab bar |
-| `RecipeStepView.swift` | | Step-by-step cooking instructions (tab) |
-| `IngredientsAndEquipmentView.swift` | | Ingredients list and required equipment (tab) |
-| `TimerView.swift` | | Countdown timer (tab) |
-| `RatingView.swift` | | Recipe rating and feedback (tab) |
-| `RecipositoryApp.swift` | Shared | App entry point and window configuration |
-
-## Pages
-
-### Voice Commands
-Initial screen shown on app launch. Lists available voice commands for hands-free navigation.
-
-### Recipe List
-Browse desserts fetched from TheMealDB API. Tap a recipe to start cooking.
-
-### Recipe (Cooking View)
-One glass bubble with 4 tabs at the bottom. Each tab is a separate file so teammates can work in parallel:
-- **Steps** → `RecipeStepView.swift`
-- **Ingredients** → `IngredientsAndEquipmentView.swift`
-- **Timer** → `TimerView.swift`
-- **Rating** → `RatingView.swift`
-
 ## Navigation Flow
+
 ```
-Voice Commands → Recipe List → Recipe (tabs: Steps | Ingredients | Timer | Rating)
+Voice Commands → Recipe List → Recipe (cooking workspace)
 ```
+
+## File Tree
+
+```
+Recipository/
+│
+├── RecipositoryApp.swift              ← App entry point & window config (Shared)
+├── ContentView.swift                  ← Router — decides which page to show (Shared)
+├── MealService.swift                  ← API service & Meal data model (Shared)
+│
+├── PAGE 1: Voice Commands
+│   └── VoiceCommandsView.swift        ← Welcome notice with voice command list
+│
+├── PAGE 2: Recipe List
+│   └── RecipeListView.swift           ← Browse desserts from TheMealDB API
+│
+└── PAGE 3: Recipe (Cooking Workspace)
+    ├── RecipeView.swift               ← Layout container (Shared)
+    │
+    ├── STEP BAR (top, wide)
+    │   └── RecipeStepView.swift       ← Current step instructions
+    │
+    ├── TIMER (top right, small)
+    │   └── TimerView.swift            ← Countdown timer
+    │
+    ├── BUTTON: Ingredients
+    │   └── IngredientsAndEquipmentView.swift
+    │
+    ├── BUTTON: Method
+    │   └── MethodView.swift
+    │
+    └── BUTTON: Finished Product
+        └── FinishedProductView.swift
+```
+
+## Cooking Workspace Layout
+
+```
+┌──────────────────────────────┐  ┌─────────┐
+│            step              │  │  timer   │
+└──────────────────────────────┘  └─────────┘
+┌─────────────┐ ┌────────┐ ┌─────────────────┐
+│ ingredients │ │ method │ │ finished product │
+└─────────────┘ └────────┘ └─────────────────┘
+
+          ( workspace stays clear )
+```
+
+## Who Works on What
+
+| File | Owner | Status |
+|------|-------|--------|
+| `RecipeStepView.swift` | | Placeholder |
+| `TimerView.swift` | | Placeholder |
+| `IngredientsAndEquipmentView.swift` | | Placeholder |
+| `MethodView.swift` | | Placeholder |
+| `FinishedProductView.swift` | | Placeholder |
+
+Fill in the **Owner** column so everyone knows who's building what.

@@ -1,5 +1,5 @@
 //
-//  IngredientsAndEquipmentView.swift
+//  MethodView.swift
 //  Recipository
 //
 //  Created by Neeti Vaidya on 4/18/26.
@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct IngredientsAndEquipmentView: View {
+struct MethodView: View {
     var body: some View {
-        // TODO: Build ingredients and equipment list UI
-        Text("Ingredients")
+        // TODO: Build method/technique view
+        Text("Method")
             .font(.subheadline)
             .fontWeight(.medium)
     }
