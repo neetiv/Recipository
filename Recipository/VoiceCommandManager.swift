@@ -1,0 +1,127 @@
+////
+////  VoiceCommandManager.swift
+////  Recipository
+////
+////  Created by Ahana Mangla on 4/18/26.
+////
+//
+//import Foundation
+//import Speech
+//import Observation
+//
+//@Observable
+//@MainActor
+//class VoiceCommandManager {
+//    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
+//    private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
+//    private var recognitionTask: SFSpeechRecognitionTask?
+//    // Audio engine is created lazily — AVAudioEngine() init can abort in simulator with no audio hardware
+//    private var audioEngine: AVAudioEngine?
+//    private var audioSetupSucceeded = false
+//
+//    // Callback to send commands back to the UI
+//    var onCommandRecognized: ((String) -> Void)?
+//
+//    func startListening() {
+//        // Check for microphone availability before creating any audio objects.
+//        guard AVAudioSession.sharedInstance().isInputAvailable else {
+//            print("No audio input available — voice commands disabled (running in simulator?)")
+//            return
+//        }
+//
+//        SFSpeechRecognizer.requestAuthorization { [weak self] status in
+//            guard status == .authorized else { return }
+//            Task { @MainActor in
+//                self?.setupRecognition()
+//            }
+//        }
+//    }
+//
+//    private func setupRecognition() {
+//        // Cancel any existing tasks
+//        recognitionTask?.cancel()
+//        recognitionTask = nil
+//        audioSetupSucceeded = false
+//
+//        // Double-check input is still available
+//        guard AVAudioSession.sharedInstance().isInputAvailable else {
+//            print("No audio input available — skipping recognition setup")
+//            return
+//        }
+//
+//        do {
+//            let audioSession = AVAudioSession.sharedInstance()
+//            try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
+//            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+//        } catch {
+//            print("Audio session setup failed: \(error)")
+//            return
+//        }
+//
+//        // Create audio engine only after confirming input is available
+//        let engine = audioEngine ?? AVAudioEngine()
+//        audioEngine = engine
+//
+//        recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
+//        guard let recognitionRequest = recognitionRequest else { return }
+//        recognitionRequest.shouldReportPartialResults = true
+//
+//        recognitionTask = speechRecognizer?.recognitionTask(with: recognitionRequest) { [weak self] result, error in
+//            guard let self else { return }
+//            if let result = result {
+//                let lastString = result.bestTranscription.formattedString.uppercased()
+//                Task { @MainActor in
+//                    self.processTranscript(lastString)
+//                }
+//            }
+//        }
+//
+//        let inputNode = engine.inputNode
+//        let recordingFormat = inputNode.outputFormat(forBus: 0)
+//
+//        guard recordingFormat.sampleRate > 0, recordingFormat.channelCount > 0 else {
+//            print("Invalid audio format — microphone may not be available")
+//            return
+//        }
+//
+//        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
+//            self?.recognitionRequest?.append(buffer)
+//        }
+//
+//        engine.prepare()
+//
+//        do {
+//            try engine.start()
+//            audioSetupSucceeded = true
+//        } catch {
+//            print("Audio engine failed to start: \(error)")
+//        }
+//    }
+//
+//    private func processTranscript(_ text: String) {
+//        if text.hasSuffix("NEXT") {
+//            onCommandRecognized?("NEXT")
+//            restartSpeechStream()
+//        } else if text.hasSuffix("BACK") {
+//            onCommandRecognized?("BACK")
+//            restartSpeechStream()
+//        } else if text.hasSuffix("START") {
+//            onCommandRecognized?("START")
+//            restartSpeechStream()
+//        } else if text.hasSuffix("STOP") {
+//            onCommandRecognized?("STOP")
+//            restartSpeechStream()
+//        } else if text.hasSuffix("SHOW INGREDIENTS") {
+//            onCommandRecognized?("SHOW INGREDIENTS")
+//            restartSpeechStream()
+//        }
+//    }
+//
+//    private func restartSpeechStream() {
+//        guard audioSetupSucceeded, let engine = audioEngine else { return }
+//        engine.stop()
+//        engine.inputNode.removeTap(onBus: 0)
+//        recognitionRequest?.endAudio()
+//        setupRecognition()
+//    }
+//}
