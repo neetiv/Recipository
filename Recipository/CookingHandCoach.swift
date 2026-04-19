@@ -20,6 +20,26 @@ final class CookingHandCoach {
     /// True while an ARKit session is running for coaching (only on supported hardware with permission).
     private(set) var isHandTrackingActive: Bool = false
 
+    /// Set once `RecipeView` requests authorization (so UI can show a Settings hint if not allowed).
+    private(set) var handTrackingAuthorizationStatus: ARKitSession.AuthorizationStatus?
+    /// `true` when hand tracking is supported but the user has not allowed access (or hasn’t been asked yet in edge cases).
+    var shouldShowHandTrackingSettingsHint: Bool {
+        guard HandTrackingProvider.isSupported else { return false }
+        guard let status = handTrackingAuthorizationStatus else { return false }
+        return status != .allowed
+    }
+
+    /// Call from `RecipeView.task` on appear **before** loading recipe steps so the system permission dialog shows immediately on hardware that supports hand tracking.
+    func requestHandTrackingAuthorizationOnAppear() async {
+        guard HandTrackingProvider.isSupported else {
+            handTrackingAuthorizationStatus = nil
+            return
+        }
+        let session = ARKitSession()
+        let result = await session.requestAuthorization(for: [.handTracking])
+        handTrackingAuthorizationStatus = result[.handTracking] ?? .notDetermined
+    }
+
     private var motionKind: CookingMotionKind = .inactive
     private var stepStartedAt: Date?
     private var session: ARKitSession?
@@ -55,6 +75,10 @@ final class CookingHandCoach {
             isHandTrackingActive = false
         default:
             guard HandTrackingProvider.isSupported else {
+                isHandTrackingActive = false
+                return
+            }
+            guard handTrackingAuthorizationStatus == .allowed else {
                 isHandTrackingActive = false
                 return
             }

@@ -12,6 +12,7 @@ struct RecipeView: View {
     @State private var detail: MealDetail? = nil
     @State private var currentStepIndex: Int = 0
     @State private var isLoading = true
+    @State private var handCoach = CookingHandCoach()
 
     private var currentStep: String {
         detail?.steps[safe: currentStepIndex] ?? ""
@@ -32,12 +33,31 @@ struct RecipeView: View {
                 }
                 .buttonStyle(.plain)
 
+                if handCoach.shouldShowHandTrackingSettingsHint {
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "hand.raised.fill")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
+                        Text("Hand tracking is off. For motion coaching, enable Hand Tracking under Settings → Privacy & Security → Recipository.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.orange.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .accessibilityElement(children: .combine)
+                }
+
                 // Top row: Step bar + Timer side by side
                 HStack(alignment: .top, spacing: 12) {
                     RecipeStepView(
                         detail: detail,
                         currentStepIndex: $currentStepIndex,
-                        isLoading: isLoading
+                        isLoading: isLoading,
+                        handCoach: handCoach
                     )
                     .frame(maxWidth: .infinity)
                     .padding(8)
@@ -71,12 +91,28 @@ struct RecipeView: View {
             }
             .padding()
         }
-        .task {
+        .task(id: meal.idMeal) {
+            await handCoach.requestHandTrackingAuthorizationOnAppear()
             isLoading = true
             detail = try? await MealService.fetchDetail(id: meal.idMeal)
             currentStepIndex = 0
             isLoading = false
+            syncHandCoachStep()
         }
+        .onChange(of: detail?.idMeal) { _, _ in
+            syncHandCoachStep()
+        }
+        .onChange(of: currentStepIndex) { _, _ in
+            syncHandCoachStep()
+        }
+        .onDisappear {
+            handCoach.stop()
+        }
+    }
+
+    private func syncHandCoachStep() {
+        guard let detail, !detail.steps.isEmpty, detail.steps.indices.contains(currentStepIndex) else { return }
+        handCoach.update(stepText: detail.steps[currentStepIndex], stepIndex: currentStepIndex)
     }
 }
 
