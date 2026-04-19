@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSHandsTrackingUsageDescription</key>
+	<string>Recipository uses hand motion while you cook to offer gentle, on-device coaching for steps like stirring or kneading. Hand data stays on your device.</string>
+	<key>NSWorldSensingUsageDescription</key>
+	<string>Recipository uses world sensing so hand positions can be interpreted in your space for cooking coaching. Processing stays on your device.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationPreferredDefaultSceneSessionRole</key>
